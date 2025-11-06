@@ -13,6 +13,7 @@ class AdjacencyListGraph:
         super().init(num_vertices)
         self.adjacencias = {i: [] for i in range(num_vertices)}
         self.edge_weights = {}
+        self.vertex_weights = {}
 
 
     def getVertexCount(self):
@@ -85,19 +86,59 @@ class AdjacencyListGraph:
         return grau
 
     def setVertexWeight(self, v: int, w: float):
-                pass
+        try:
+            weight = float(w)
+        except (TypeError, ValueError):
+            raise ValueError('Peso inválido; espere um número.')
+        self.vertex_weights[v] = weight
 
     def getVertexWeight(self, v: int):
-                pass
+        return self.vertex_weights.get(v, 0.0)
 
-    def setEdgeWeight(self, v: int, u: int, w: float):
-                pass
+    def setEdgeWeight(self, u: int, v: int, w: float):
+        try:
+            weight = float(w)
+        except (TypeError, ValueError):
+            raise ValueError('Peso inválido; espere um número.')
+
+        self.edge_weights[(u, v)] = weight
 
     def getEdgeWeight(self, u: int, v: int):
-                pass
+        return self.edge_weights.get((u, v), 0.0)
 
     def isConnected(self):
-                pass
+       
+        # Busca em largura
+        visited = [False] * n
+        q = deque([0])
+        visited[0] = True
+        while q:
+            u = q.popleft() # remove e retorna o elemento mais à esquerda 
+            for v in self.adjacencias.get(u, []):
+                if not visited[v]:
+                    visited[v] = True
+                    q.append(v)
+
+        if not all(visited):
+            return False
+
+        # constroi grafo transposto
+        rev = {i: [] for i in range(n)}
+        for u in range(n):
+            for v in self.adjacencias.get(u, []):
+                rev[v].append(u)
+
+        visited = [False] * n
+        q = deque([0])
+        visited[0] = True
+        while q:
+            u = q.popleft()
+            for v in rev.get(u, []):
+                if not visited[v]:
+                    visited[v] = True
+                    q.append(v)
+
+        return all(visited)
 
     def isEmptyGraph(self) -> bool:
         if(self.getEdgeCount() == 0):
