@@ -1,9 +1,9 @@
 import os
-import vertice
+#import vertice
 from collections import deque
 import AbstractGraph
 
-from src.lib_grafo.aresta import aresta
+#from src.lib_grafo.aresta import aresta
 
 
 class AdjacencyListGraph:
@@ -19,13 +19,13 @@ class AdjacencyListGraph:
         return self.num_vertices
 
 
-    def getEdgeCount(self):
-        int totalArestas = 0
-        for i in range(self.num_vertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] is not None:
-                    totalArestas += 1
-        return totalArestas
+    #def getEdgeCount(self):
+        #int totalArestas = 0
+        #for i in range(self.num_vertices):
+         #   for j in range(len(self.adjacencias[i])):
+        #        if self.adjacencias[i][j] is not None:
+         #           totalArestas += 1
+        #return totalArestas
 
 
     def hasEdge(self, u: int, v: int) -> bool:
@@ -70,19 +70,19 @@ class AdjacencyListGraph:
     def isIncident(self, u: int, v1: int, u2: int, v2: int):
                 pass
 
-    def getVertexInDegree(self, u: int):
-        int grau = 0
-        for i in range(self.num_vertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] == u:
-                    grau += 1
-        return grau
+    #def getVertexInDegree(self, u: int):
+        #int grau = 0
+        #for i in range(self.num_vertices):
+          #  for j in range(len(self.adjacencias[i])):
+         #       if self.adjacencias[i][j] == u:
+         #           grau += 1
+        #return grau
 
-    def getVertexOutDegree(self, u: int):
-        int grau = 0
-        for i in range(len(self.adjacencias[u])):
-            grau += 1
-        return grau
+    #def getVertexOutDegree(self, u: int):
+       # int grau = 0
+        #for i in range(len(self.adjacencias[u])):
+        #    grau += 1
+        #return grau
 
     def setVertexWeight(self, v: int, w: float):
                 pass
