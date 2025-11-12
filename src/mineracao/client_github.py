@@ -50,3 +50,33 @@ class GithubClient:
                 arr_pulls_merged.append(pull);
 
         return arr_pulls_merged
+
+    def getUsersFromOpenIssues(self):
+        urlBusca = f"{GithubClient.URLBASE}/issues";
+        arr_issues = requests.get(url=urlBusca, headers=self.headers, params={"state": "open"}).json();
+
+        arr_users = [];
+        for issue in arr_issues:
+            assignee = issue.get("user")
+
+            if assignee:
+                login = assignee.get("login")
+                if login:
+                    arr_users.append(login)
+
+        return arr_users;
+
+    def getUsersFromClosedIssues(self):
+        urlBusca = f"{GithubClient.URLBASE}/issues";
+        arr_issues = requests.get(url=urlBusca, headers=self.headers, params={"state": "closed"}).json();
+
+        arr_users = [];
+        for issue in arr_issues:
+            assignee = issue.get("user")
+
+            if assignee:
+                login = assignee.get("login")
+                if login:
+                    arr_users.append(login)
+
+        return arr_users;

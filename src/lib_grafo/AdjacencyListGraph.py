@@ -1,9 +1,9 @@
 import os
-import vertice
+#import vertice
 from collections import deque
-import AbstractGraph
+from src.lib_grafo.AbstractGraph import AbstractGraph
 
-from src.lib_grafo.aresta import aresta
+#from src.lib_grafo.aresta import aresta
 
 
 class AdjacencyListGraph:
@@ -34,128 +34,88 @@ class AdjacencyListGraph:
         #return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
-              for i in range(len(self.adjacencias[u])):
-                  if self.adjacencias[u][i] == v:
-                      return True
-              return False
-
-
-    def addEdge(self, u: int, v: int):
-        if self.isSucessor(self, u, v) or v == u:
-           print("ja possui esta aresta")
-           pass
-        self.adjacencias[u].append(v)
-
-
-    def removeEdge(self, u: int, v: int):
-        if self.isSucessor(self, u, v):
-            self.adjacencias[u].remove(v)
-        else:
-            print("aresta nao existe")
-
-
-
-    def isSucessor(self, u: int, v: int)-> bool:
         for i in range(len(self.adjacencias[u])):
             if self.adjacencias[u][i] == v:
                 return True
         return False
 
+    def addEdge(self, u: int, v: int):
+        if v == u:
+            print("nao e permitido laco")
+            return
+        if self.hasEdge(u, v):
+            print("ja possui esta aresta")
+            return
+        self.adjacencias[u].append(v)
+
+    def removeEdge(self, u: int, v: int):
+        if self.hasEdge(u, v):
+            self.adjacencias[u].remove(v)
+        else:
+            print("aresta nao existe")
+
+    def isSucessor(self, u: int, v: int) -> bool:
+        for i in range(len(self.adjacencias[u])):
+            if self.adjacencias[u][i] == v:
+                return True
+        return False
 
     def isPredecessor(self, u: int, v: int) -> bool:
-        return self.isSucessor(self, v, u)
+        return self.isSucessor(v, u)
 
+    def isDivergent(self, u1, v1, u2, v2):
+        return u1 == u2 and (v1 != v2)
 
-    def isDivergent(self, u1: int, v1: int, u2: int, v2: int):
-                pass
+    def isConvergent(self, u1, v1, u2, v2):
+        return v1 == v2 and (u1 != u2)
 
-    def isConvergent(self, u1: int, v1: int, u2: int, v2: int):
-                pass
+    def isIncident(self, u, v, x):
+        return x == u or x == v
 
-    def isIncident(self, u: int, v1: int, u2: int, v2: int):
-                pass
+    #def getVertexInDegree(self, u: int):
+        #int grau = 0
+        #for i in range(self.num_vertices):
+          #  for j in range(len(self.adjacencias[i])):
+         #       if self.adjacencias[i][j] == u:
+         #           grau += 1
+        #return grau
 
-    def getVertexInDegree(self, u: int):
-        int grau = 0
-        for i in range(self.num_vertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] == u:
-                    grau += 1
-        return grau
-
-    def getVertexOutDegree(self, u: int):
-        int grau = 0
-        for i in range(len(self.adjacencias[u])):
-            grau += 1
-        return grau
+    #def getVertexOutDegree(self, u: int):
+       # int grau = 0
+        #for i in range(len(self.adjacencias[u])):
+        #    grau += 1
+        #return grau
 
     def setVertexWeight(self, v: int, w: float):
-        try:
-            weight = float(w)
-        except (TypeError, ValueError):
-            raise ValueError('Peso inválido; espere um número.')
-        self.vertex_weights[v] = weight
+        self.vertex_weights[v] = w
 
     def getVertexWeight(self, v: int):
-        return self.vertex_weights.get(v, 0.0)
+        return self.vertex_weights[v]
 
     def setEdgeWeight(self, u: int, v: int, w: float):
-        try:
-            weight = float(w)
-        except (TypeError, ValueError):
-            raise ValueError('Peso inválido; espere um número.')
-
-        self.edge_weights[(u, v)] = weight
+        if not self.hasEdge(u, v):
+            raise ValueError("aresta nao existe para definir peso")
+        self.edge_weights[(u, v)] = w
 
     def getEdgeWeight(self, u: int, v: int):
-        return self.edge_weights.get((u, v), 0.0)
+        return self.edge_weights.get((u, v), 1.0)
 
     def isConnected(self):
-       
-        # Busca em largura
-        visited = [False] * n
-        q = deque([0])
-        visited[0] = True
-        while q:
-            u = q.popleft() # remove e retorna o elemento mais à esquerda 
-            for v in self.adjacencias.get(u, []):
-                if not visited[v]:
-                    visited[v] = True
-                    q.append(v)
-
-        if not all(visited):
-            return False
-
-        # constroi grafo transposto
-        rev = {i: [] for i in range(n)}
-        for u in range(n):
-            for v in self.adjacencias.get(u, []):
-                rev[v].append(u)
-
-        visited = [False] * n
-        q = deque([0])
-        visited[0] = True
-        while q:
-            u = q.popleft()
-            for v in rev.get(u, []):
-                if not visited[v]:
-                    visited[v] = True
-                    q.append(v)
-
-        return all(visited)
+        visitados = set()
+        def dfs(v):
+            if v not in visitados:
+                visitados.add(v)
+                for viz in self.adjacencias[v]:
+                    dfs(viz)
+        dfs(0)
+        return len(visitados) == self.numVertices
 
     def isEmptyGraph(self) -> bool:
-        if(self.getEdgeCount() == 0):
-            return True
-        return False
+        return self.getEdgeCount() == 0
 
     def isCompleteGraph(self) -> bool:
-        if self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1)):
-            return True
-        return False
+        return self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1))
 
-
-
-
-
-
+    def mostrarGrafo(self):
+        for u, vizinhos in self.adjacencias.items():
+            print(f"{u} -> {vizinhos}")
