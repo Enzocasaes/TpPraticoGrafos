@@ -8,26 +8,30 @@ from src.lib_grafo.aresta import aresta
 
 class AdjacencyListGraph:
 
-
-    def init(self, num_vertices):
-        super().init(num_vertices)
+    def __init__(self, num_vertices: int):
+        self.numVertices = num_vertices
         self.adjacencias = {i: [] for i in range(num_vertices)}
         self.edge_weights = {}
         self.vertex_weights = {}
 
 
-    def getVertexCount(self):
-        return self.num_vertices
 
+    def getVertexCount(self):
+        return self.numVertices
 
     def getEdgeCount(self):
-        int totalArestas = 0
-        for i in range(self.num_vertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] is not None:
-                    totalArestas += 1
-        return totalArestas
+        total = 0
+        for u in self.adjacencias:
+            total += len(self.adjacencias[u])
+        return total
 
+    #def getEdgeCount(self):
+        #int totalArestas = 0
+        #for i in range(self.num_vertices):
+         #   for j in range(len(self.adjacencias[i])):
+        #        if self.adjacencias[i][j] is not None:
+         #           totalArestas += 1
+        #return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
               for i in range(len(self.adjacencias[u])):
