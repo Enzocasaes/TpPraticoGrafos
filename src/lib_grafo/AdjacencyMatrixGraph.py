@@ -25,7 +25,7 @@ class AdjacencyMatrixGraph(AbstractGraph):
         row = v - 1
         col = w - 1
 
-        if self.matrix[row][col] == 0:  #| self.matrix[col][row] == 0
+        if self.matrix[row][col] == 0 | self.matrix[col][row] == 0:
             return False
         return True
 
@@ -37,8 +37,8 @@ class AdjacencyMatrixGraph(AbstractGraph):
         row = v - 1
         col = w - 1
 
-        if self.hasEdge(v, w):
-            raise ValueError("Aresta existente")
+        #if self.isDivergent(v, w):
+            #raise ValueError("Aresta existente")
         self.matrix[row][col] = 1
         self.numArestas += 1
 
@@ -68,8 +68,9 @@ class AdjacencyMatrixGraph(AbstractGraph):
             return True
         return False
 
-    def isDivergent(self):
-        pass
+    def isDivergent(self, u1: int, v1: int, u2: int, v2: int) -> bool:
+
+        return (u1 == u2) and (v1 != v2) and self.hasEdge(u1, v1) and self.hasEdge(u2, v2)
     def isConvergent(self):
         pass
     def isIncident(self, v: int, w: int, x: int):
