@@ -1,10 +1,16 @@
 import os
+#import vertice
 from collections import deque
 from src.lib_grafo.AbstractGraph import AbstractGraph
 
-class AdjacencyListGraph(AbstractGraph):
-    def __init__(self, num_vertices):
-        super().__init__(num_vertices)
+#from src.lib_grafo.aresta import aresta
+
+
+class AdjacencyListGraph:
+
+
+    def init(self, num_vertices):
+        super().init(num_vertices)
         self.adjacencias = {i: [] for i in range(num_vertices)}
         self.edge_weights = {}
         self.vertex_weights = {}
@@ -12,13 +18,13 @@ class AdjacencyListGraph(AbstractGraph):
     def getVertexCount(self):
         return self.numVertices
 
-    def getEdgeCount(self):
-        totalArestas = 0
-        for i in range(self.numVertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] is not None:
-                    totalArestas += 1
-        return totalArestas
+    #def getEdgeCount(self):
+        #int totalArestas = 0
+        #for i in range(self.num_vertices):
+         #   for j in range(len(self.adjacencias[i])):
+        #        if self.adjacencias[i][j] is not None:
+         #           totalArestas += 1
+        #return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
         for i in range(len(self.adjacencias[u])):
@@ -59,19 +65,19 @@ class AdjacencyListGraph(AbstractGraph):
     def isIncident(self, u, v, x):
         return x == u or x == v
 
-    def getVertexInDegree(self, u: int):
-        grau = 0
-        for i in range(self.numVertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] == u:
-                    grau += 1
-        return grau
+    #def getVertexInDegree(self, u: int):
+        #int grau = 0
+        #for i in range(self.num_vertices):
+          #  for j in range(len(self.adjacencias[i])):
+         #       if self.adjacencias[i][j] == u:
+         #           grau += 1
+        #return grau
 
-    def getVertexOutDegree(self, u: int):
-        grau = 0
-        for i in range(len(self.adjacencias[u])):
-            grau += 1
-        return grau
+    #def getVertexOutDegree(self, u: int):
+       # int grau = 0
+        #for i in range(len(self.adjacencias[u])):
+        #    grau += 1
+        #return grau
 
     def setVertexWeight(self, v: int, w: float):
         self.vertex_weights[v] = w
