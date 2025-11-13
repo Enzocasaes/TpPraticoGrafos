@@ -1,8 +1,8 @@
 import os
 
-##from TpPraticoGrafos.src.lib_grafo.AbstractGraph import AbstractGraph
+from TpPraticoGrafos.src.lib_grafo.AbstractGraph import AbstractGraph
 
-class AdjacencyMatrixGraph():##AbstractGraph):
+class AdjacencyMatrixGraph(AbstractGraph):
 
     def __init__(self, numVertices: int):
         self.numVertices = numVertices
