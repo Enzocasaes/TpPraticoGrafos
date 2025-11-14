@@ -95,7 +95,7 @@ class AdjacencyListGraph:
         self.edge_weights[(u, v)] = w
 
     def getEdgeWeight(self, u: int, v: int):
-        return self.edge_weights.get((u, v), 1.0)
+        return self.edge_weights.get((u, v))
 
     def isCompleteGraph(self) -> bool:
         return self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1))
@@ -107,45 +107,55 @@ class AdjacencyListGraph:
         for u, vizinhos in self.adjacencias.items():
             print(f"{u} -> {vizinhos}")
 
-# --- Teste simples da inicialização ---
-os.system('cls' if os.name == 'nt' else 'clear')
+    def exportToGEPHI(self, path: str):
+        """
+        Exports the graph to a file in GraphML format (.graphml),
+        compatible with the GEPHI visualization software.
+        """
+        try:
+            with open(path, 'w') as f:
+                # 1. Write the XML Header and GraphML Root
+                f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                f.write('<graphml xmlns="http://graphml.graphdrawing.org/xmlns" '
+                        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+                        'xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns '
+                        'http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n')
 
-numVertices = int(input("Digite o número de vértices: "))
-graph = AdjacencyListGraph(numVertices)
+                # 2. Define Keys for Attributes (Weights)
+                # Key for Vertex Weight
+                if self.vertex_weights:
+                    f.write('  <key id="d0" for="node" attr.name="weight" attr.type="double"/>\n')
+                # Key for Edge Weight
+                f.write('  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>\n')
 
-print("\nMatriz de Adjacência Inicial:")
-# Vértice 1 se conecta a todos os outros
-graph.addEdge(1, 2)
-graph.addEdge(1, 3)
-graph.addEdge(1, 4)
+                # 3. Start the Graph Structure (directed since you check for antiparallel edges)
+                f.write('  <graph id="G" edgedefault="directed">\n')
 
-# Vértice 2 se conecta a todos os outros
-graph.addEdge(2, 1)
-graph.addEdge(2, 3)
-graph.addEdge(2, 4)
+                # 4. Write Nodes (Vertices)
+                for u in range(self.numVertices):
+                    f.write(f'    <node id="{u}">\n')
+                    # Add Vertex Weight if it exists
+                    if u in self.vertex_weights:
+                        weight = self.vertex_weights[u]
+                        f.write(f'      <data key="d0">{weight}</data>\n')
+                    f.write('    </node>\n')
 
-# Vértice 3 se conecta a todos os outros
-graph.addEdge(3, 1)
-graph.addEdge(3, 2)
-graph.addEdge(3, 4)
+                # 5. Write Edges
+                for u in range(self.numVertices):
+                    for v in self.adjacencias[u]:
+                        edge_key = (u, v)
+                        # Get the explicit weight or default to 1.0 (as per getEdgeWeight)
+                        weight = self.getEdgeWeight(u, v)
 
-# Vértice 4 se conecta a todos os outros
-graph.addEdge(4, 1)
-graph.addEdge(4, 2)
-graph.addEdge(4, 3)
-graph.setEdgeWeight(1,2,5)
-graph.setEdgeWeight(2,4,9)
-print(len())
-#print(graph.isCompleteGraph())
-#print(graph.getVertexInDegree(1))
-#print(graph.getVertexInDegree(4))
-#print(graph.getVertexOutDegree(1))
-#print(graph.getVertexOutDegree(4))
-#print(graph.isSucessor(3, 1))
-#print(graph.isSucessor(4, 3))
-#print(graph.isPredecessor(3, 1))
-#print(graph.getVertexCount())
-#print(graph.getEdgeCount())
-#print(graph.hasEdge(1, 2))
-#print(graph.hasEdge(2, 1))
-#print(graph.hasEdge(1, 3))
+                        f.write(f'    <edge source="{u}" target="{v}">\n')
+                        f.write(f'      <data key="d1">{weight}</data>\n')  # Edge weight
+                        f.write('    </edge>\n')
+
+                # 6. Close Tags
+                f.write('  </graph>\n')
+                f.write('</graphml>\n')
+
+            print(f"\nGrafo exportado com sucesso para: {path}")
+
+        except Exception as e:
+            print(f"\nErro ao exportar o grafo: {e}")
