@@ -9,22 +9,22 @@ from src.lib_grafo.AbstractGraph import AbstractGraph
 class AdjacencyListGraph:
 
 
-    def init(self, num_vertices):
-        super().init(num_vertices)
-        self.adjacencias = {i: [] for i in range(num_vertices)}
+    def __init__(self, numVertices):
+        self.numVertices = numVertices
+        self.adjacencias = {i: [] for i in range(numVertices)}
         self.edge_weights = {}
         self.vertex_weights = {}
 
     def getVertexCount(self):
         return self.numVertices
 
-    #def getEdgeCount(self):
-        #int totalArestas = 0
-        #for i in range(self.num_vertices):
-         #   for j in range(len(self.adjacencias[i])):
-        #        if self.adjacencias[i][j] is not None:
-         #           totalArestas += 1
-        #return totalArestas
+    def getEdgeCount(self):
+     totalArestas = 0
+     for i in range(self.numVertices):
+       for j in range(len(self.adjacencias[i])):
+            if self.adjacencias[i][j] is not None:
+               totalArestas += 1
+     return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
         for i in range(len(self.adjacencias[u])):
@@ -37,8 +37,12 @@ class AdjacencyListGraph:
             print("nao e permitido laco")
             return
         if self.hasEdge(u, v):
-            print("ja possui esta aresta")
+            print(f"ja possui esta aresta: {u} -> {v} ")
             return
+        if self.hasEdge(v, u):
+            print(f"antiparalela: {u} -> {v} ")
+            return
+
         self.adjacencias[u].append(v)
 
     def removeEdge(self, u: int, v: int):
@@ -65,19 +69,19 @@ class AdjacencyListGraph:
     def isIncident(self, u, v, x):
         return x == u or x == v
 
-    #def getVertexInDegree(self, u: int):
-        #int grau = 0
-        #for i in range(self.num_vertices):
-          #  for j in range(len(self.adjacencias[i])):
-         #       if self.adjacencias[i][j] == u:
-         #           grau += 1
-        #return grau
+    def getVertexInDegree(self, u: int):
+        grau = 0
+        for i in range(self.numVertices):
+            for j in range(len(self.adjacencias[i])):
+                if self.adjacencias[i][j] == u:
+                    grau += 1
+        return grau
 
-    #def getVertexOutDegree(self, u: int):
-       # int grau = 0
-        #for i in range(len(self.adjacencias[u])):
-        #    grau += 1
-        #return grau
+    def getVertexOutDegree(self, u: int):
+        grau = 0
+        for i in range(len(self.adjacencias[u])):
+            grau += 1
+        return grau
 
     def setVertexWeight(self, v: int, w: float):
         self.vertex_weights[v] = w
@@ -93,22 +97,55 @@ class AdjacencyListGraph:
     def getEdgeWeight(self, u: int, v: int):
         return self.edge_weights.get((u, v), 1.0)
 
-    def isConnected(self):
-        visitados = set()
-        def dfs(v):
-            if v not in visitados:
-                visitados.add(v)
-                for viz in self.adjacencias[v]:
-                    dfs(viz)
-        dfs(0)
-        return len(visitados) == self.numVertices
+    def isCompleteGraph(self) -> bool:
+        return self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1))
 
     def isEmptyGraph(self) -> bool:
         return self.getEdgeCount() == 0
 
-    def isCompleteGraph(self) -> bool:
-        return self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1))
-
     def mostrarGrafo(self):
         for u, vizinhos in self.adjacencias.items():
             print(f"{u} -> {vizinhos}")
+
+# --- Teste simples da inicialização ---
+os.system('cls' if os.name == 'nt' else 'clear')
+
+numVertices = int(input("Digite o número de vértices: "))
+graph = AdjacencyListGraph(numVertices)
+
+print("\nMatriz de Adjacência Inicial:")
+# Vértice 1 se conecta a todos os outros
+graph.addEdge(1, 2)
+graph.addEdge(1, 3)
+graph.addEdge(1, 4)
+
+# Vértice 2 se conecta a todos os outros
+graph.addEdge(2, 1)
+graph.addEdge(2, 3)
+graph.addEdge(2, 4)
+
+# Vértice 3 se conecta a todos os outros
+graph.addEdge(3, 1)
+graph.addEdge(3, 2)
+graph.addEdge(3, 4)
+
+# Vértice 4 se conecta a todos os outros
+graph.addEdge(4, 1)
+graph.addEdge(4, 2)
+graph.addEdge(4, 3)
+graph.setEdgeWeight(1,2,5)
+graph.setEdgeWeight(2,4,9)
+print(len())
+#print(graph.isCompleteGraph())
+#print(graph.getVertexInDegree(1))
+#print(graph.getVertexInDegree(4))
+#print(graph.getVertexOutDegree(1))
+#print(graph.getVertexOutDegree(4))
+#print(graph.isSucessor(3, 1))
+#print(graph.isSucessor(4, 3))
+#print(graph.isPredecessor(3, 1))
+#print(graph.getVertexCount())
+#print(graph.getEdgeCount())
+#print(graph.hasEdge(1, 2))
+#print(graph.hasEdge(2, 1))
+#print(graph.hasEdge(1, 3))

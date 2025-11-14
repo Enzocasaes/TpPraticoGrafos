@@ -1,6 +1,6 @@
 import os
 
-from TpPraticoGrafos.src.lib_grafo.AbstractGraph import AbstractGraph
+from src.lib_grafo.AbstractGraph import AbstractGraph
 
 class AdjacencyMatrixGraph(AbstractGraph):
 
@@ -61,7 +61,7 @@ class AdjacencyMatrixGraph(AbstractGraph):
         else:
             raise ValueError("Não existe aresta para remover")
 
-    def isSuccessor(self, suc: int, pre: int) -> bool:
+    def isSucessor(self, suc: int, pre: int) -> bool:
         self.validVertex(suc)
         self.validVertex(pre)
 
@@ -166,7 +166,7 @@ class AdjacencyMatrixGraph(AbstractGraph):
         else:
             raise ValueError("Não existe aresta entre os vértices.")
 
-    def isconnected(self) -> bool:
+    def isConnected(self) -> bool:
         if self.numVertices == 0:
             return True
 
