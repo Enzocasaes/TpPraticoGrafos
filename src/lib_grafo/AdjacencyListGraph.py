@@ -97,8 +97,31 @@ class AdjacencyListGraph(AbstractGraph):
     def isEmptyGraph(self) -> bool:
         return self.getEdgeCount() == 0
 
-    def isConnected(self):
+    def isConnected(self) -> bool:
+        if self.numVertices == 0:
+            return True
 
+        # marca todos os V como não visitados
+        visited = [False] * self.numVertices
+
+        # chama a busca em profundidade começando do V = 0
+        self.buscaProfundidade(0, visited)
+
+        # caso todas os V estiverem marcado como visitado volta TRUE
+        return all(visited)
+    
+    def buscaProfundidade(self, v: int, visited: list[bool]):
+        visited[v] = True
+
+        # laço visitando todos os vizinhos diretos (arestas v -> x)
+        for neighbor in self.adjacencias[v]:
+            if not visited[neighbor]:
+                self.buscaProfundidade(neighbor, visited)
+
+        # procura todos os vertices que tem "v" como sucessor (arestas x -> v)
+        for u in range(self.numVertices):
+            if v in self.adjacencias[u] and not visited[u]:
+                self.buscaProfundidade(u, visited)
 
     def mostrarGrafo(self):
         for u, vizinhos in self.adjacencias.items():
