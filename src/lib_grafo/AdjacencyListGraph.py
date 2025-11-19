@@ -9,6 +9,13 @@ class AdjacencyListGraph(AbstractGraph):
         self.edge_weights = {}
         self.vertex_weights = {}
 
+
+    # método para validação do vértice
+    # caso falhe já lança a exceção
+    def _validate_vertex(self, v):
+        if v < 0 or v >= self.numVertices:
+            raise IndexError(f"Vertice {v} invalido")
+        
     def getVertexCount(self):
         return self.numVertices
 
@@ -21,31 +28,38 @@ class AdjacencyListGraph(AbstractGraph):
      return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
+        self._validate_vertex(u)
+        self._validate_vertex(v)
+
         for i in range(len(self.adjacencias[u])):
             if self.adjacencias[u][i] == v:
                 return True
         return False
 
     def addEdge(self, u: int, v: int):
+        self._validate_vertex(u)
+        self._validate_vertex(v)
+
         if v == u:
-            print("nao e permitido laco")
-            return
+            raise ValueError("laco nao permitido em grafo simples")
         if self.hasEdge(u, v):
-            print(f"ja possui esta aresta: {u} -> {v} ")
-            return
-        if self.hasEdge(v, u):
-            print(f"antiparalela: {u} -> {v} ")
-            return
+            raise ValueError(f"ja possui esta aresta: {u} -> {v} ")
 
         self.adjacencias[u].append(v)
 
     def removeEdge(self, u: int, v: int):
+        self._validate_vertex(u)
+        self._validate_vertex(v)
+        
         if self.hasEdge(u, v):
             self.adjacencias[u].remove(v)
         else:
-            print("aresta nao existe")
+            raise ValueError("aresta nao existe")
 
     def isSucessor(self, u: int, v: int) -> bool:
+        self._validate_vertex(u)
+        self._validate_vertex(v)
+
         for i in range(len(self.adjacencias[u])):
             if self.adjacencias[u][i] == v:
                 return True
@@ -64,6 +78,8 @@ class AdjacencyListGraph(AbstractGraph):
         return x == u or x == v
 
     def getVertexInDegree(self, u: int):
+        self._validate_vertex(u)
+
         grau = 0
         for i in range(self.numVertices):
             for j in range(len(self.adjacencias[i])):
@@ -72,18 +88,25 @@ class AdjacencyListGraph(AbstractGraph):
         return grau
 
     def getVertexOutDegree(self, u: int):
+        self._validate_vertex(u)
+
         grau = 0
         for i in range(len(self.adjacencias[u])):
             grau += 1
         return grau
 
     def setVertexWeight(self, v: int, w: float):
+        self._validate_vertex(v)
+
         self.vertex_weights[v] = w
 
     def getVertexWeight(self, v: int):
+        self._validate_vertex(v)
+
         return self.vertex_weights[v]
 
     def setEdgeWeight(self, u: int, v: int, w: float):
+        # haxEdge ja trata exceções, verificando o U e V
         if not self.hasEdge(u, v):
             raise ValueError("aresta nao existe para definir peso")
         self.edge_weights[(u, v)] = w
@@ -97,8 +120,31 @@ class AdjacencyListGraph(AbstractGraph):
     def isEmptyGraph(self) -> bool:
         return self.getEdgeCount() == 0
 
-    def isConnected(self):
+    def isConnected(self) -> bool:
+        if self.numVertices == 0:
+            return True
 
+        # marca todos os V como não visitados
+        visited = [False] * self.numVertices
+
+        # chama a busca em profundidade começando do V = 0
+        self.buscaProfundidade(0, visited)
+
+        # caso todas os V estiverem marcado como visitado volta TRUE
+        return all(visited)
+    
+    def buscaProfundidade(self, v: int, visited: list[bool]):
+        visited[v] = True
+
+        # laço visitando todos os vizinhos diretos (arestas v -> x)
+        for neighbor in self.adjacencias[v]:
+            if not visited[neighbor]:
+                self.buscaProfundidade(neighbor, visited)
+
+        # procura todos os vertices que tem "v" como sucessor (arestas x -> v)
+        for u in range(self.numVertices):
+            if v in self.adjacencias[u] and not visited[u]:
+                self.buscaProfundidade(u, visited)
 
     def mostrarGrafo(self):
         for u, vizinhos in self.adjacencias.items():
