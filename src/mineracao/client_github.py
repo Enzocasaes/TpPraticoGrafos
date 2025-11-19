@@ -1,5 +1,6 @@
 import os
 import requests
+import re
 
 class GithubClient:
     URLBASE = "https://api.github.com/repos/sorrycc/awesome-javascript"
@@ -14,11 +15,43 @@ class GithubClient:
 
     def getIssues(self):
         ulrBusca = f"{GithubClient.URLBASE}/issues"
-        return requests.get(url=ulrBusca, headers=self.headers).json()
+        issues = requests.get(url=ulrBusca, headers=self.headers).json()
+
+        arr_id_issues = []
+        for issue in issues:
+            arr_id_issues.append(issue["number"])
+
+        return arr_id_issues
+
+    def getOwnerIdByIssue(self, issueId):
+        ulrBusca = f"{GithubClient.URLBASE}/issues/{issueId}"
+        issue = requests.get(url=ulrBusca, headers=self.headers).json()
+        user = issue.get("user")
+        if user:
+            return user.get("id")
 
     def getIssuesComments(self):
         ulrBusca = f"{GithubClient.URLBASE}/issues/comments"
-        return requests.get(url=ulrBusca, headers=self.headers).json()
+        arr_issues_comments = requests.get(url=ulrBusca, headers=self.headers).json()
+        arr_users_comments = []
+
+        for issue in arr_issues_comments:
+            if issue["author_association"] == "OWNER":
+                continue
+
+            issue_url = issue["issue_url"]
+            if issue_url:
+                match = re.search(r"\/(\d+)$", issue_url)
+                if match:
+                    id_issue = match.group(1)
+
+            user = issue.get("user")
+            if user:
+                id_user = user.get("id")
+                if id_user:
+                    arr_users_comments.append((id_user,id_issue))
+
+        return arr_users_comments
 
     def getIssueComments(self, issueId: str):
         urlBusca = f"{GithubClient.URLBASE}/issues/{issueId}/comments"
@@ -75,8 +108,8 @@ class GithubClient:
             assignee = issue.get("user")
 
             if assignee:
-                login = assignee.get("login")
-                if login:
-                    arr_users.append(login)
+                userId = assignee.get("id")
+                if userId:
+                    arr_users.append(userId)
 
         return arr_users
