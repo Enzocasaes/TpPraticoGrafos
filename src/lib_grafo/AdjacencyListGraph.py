@@ -1,13 +1,7 @@
-import os
-#import vertice
-from collections import deque
 from src.lib_grafo.AbstractGraph import AbstractGraph
 
-#from src.lib_grafo.aresta import aresta
 
-
-class AdjacencyListGraph:
-
+class AdjacencyListGraph(AbstractGraph):
 
     def __init__(self, numVertices):
         self.numVertices = numVertices
@@ -103,35 +97,25 @@ class AdjacencyListGraph:
     def isEmptyGraph(self) -> bool:
         return self.getEdgeCount() == 0
 
+    def isConnected(self):
+
+
     def mostrarGrafo(self):
         for u, vizinhos in self.adjacencias.items():
             print(f"{u} -> {vizinhos}")
 
     def exportToGEPHI(self, path: str):
-        """
-        Exports the graph to a file in GraphML format (.graphml),
-        compatible with the GEPHI visualization software.
-        """
         try:
             with open(path, 'w') as f:
-                # 1. Write the XML Header and GraphML Root
                 f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
                 f.write('<graphml xmlns="http://graphml.graphdrawing.org/xmlns" '
                         'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
                         'xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns '
                         'http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n')
-
-                # 2. Define Keys for Attributes (Weights)
-                # Key for Vertex Weight
                 if self.vertex_weights:
                     f.write('  <key id="d0" for="node" attr.name="weight" attr.type="double"/>\n')
-                # Key for Edge Weight
                 f.write('  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>\n')
-
-                # 3. Start the Graph Structure (directed since you check for antiparallel edges)
                 f.write('  <graph id="G" edgedefault="directed">\n')
-
-                # 4. Write Nodes (Vertices)
                 for u in range(self.numVertices):
                     f.write(f'    <node id="{u}">\n')
                     # Add Vertex Weight if it exists
@@ -139,19 +123,15 @@ class AdjacencyListGraph:
                         weight = self.vertex_weights[u]
                         f.write(f'      <data key="d0">{weight}</data>\n')
                     f.write('    </node>\n')
-
-                # 5. Write Edges
                 for u in range(self.numVertices):
                     for v in self.adjacencias[u]:
                         edge_key = (u, v)
-                        # Get the explicit weight or default to 1.0 (as per getEdgeWeight)
                         weight = self.getEdgeWeight(u, v)
 
                         f.write(f'    <edge source="{u}" target="{v}">\n')
                         f.write(f'      <data key="d1">{weight}</data>\n')  # Edge weight
                         f.write('    </edge>\n')
 
-                # 6. Close Tags
                 f.write('  </graph>\n')
                 f.write('</graphml>\n')
 
