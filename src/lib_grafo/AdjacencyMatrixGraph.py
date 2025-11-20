@@ -17,7 +17,7 @@ class AdjacencyMatrixGraph(AbstractGraph):
         return self.numArestas
 
     def validVertex(self, v: int):
-        if v > self.numVertices or v <= 0:
+        if v > self.numVertices or v < 0:
             raise ValueError("Índice de vértice inválido")
 
     def hasEdge(self, v: int, w: int) -> bool:
@@ -38,7 +38,7 @@ class AdjacencyMatrixGraph(AbstractGraph):
         self.validVertex(v)
         self.validVertex(w)
         if v == w:
-            raise ValueError("Não é possível adicionar arestar que gerem laços.")
+           return
         row = v - 1
         col = w - 1
         peso_vertice, peso_aresta = self.matrix[row][col]
@@ -256,78 +256,3 @@ class AdjacencyMatrixGraph(AbstractGraph):
         # === Escreve o arquivo ===
         tree = ET.ElementTree(gexf)
         tree.write(path, encoding="utf-8", xml_declaration=True)
-
-
-
-# --- Teste simples da inicialização ---
-os.system('cls' if os.name == 'nt' else 'clear')
-
-num_vertices = int(input("Digite o número de vértices: "))
-graph = AdjacencyMatrixGraph(num_vertices)
-
-print("\nMatriz de Adjacência Inicial:")
-# Vértice 1 se conecta a todos os outros
-#graph.addEdge(1, 2)
-#graph.addEdge(1, 3)
-#graph.addEdge(1, 4)
-
-# Vértice 2 se conecta a todos os outros
-graph.addEdge(2, 1)
-graph.addEdge(2, 3)
-graph.addEdge(2, 4)
-
-# Vértice 3 se conecta a todos os outros
-graph.addEdge(3, 1)
-graph.addEdge(3, 2)
-graph.addEdge(3, 4)
-
-# Vértice 4 se conecta a todos os outros
-#graph.addEdge(4, 1)
-#graph.addEdge(4, 2)
-#graph.addEdge(4, 3)
-# graph.setEdgeWeight(1,2,5)
-# graph.setEdgeWeight(2,4,9)
-print(graph.isCompleteGraph())
-##print(graph.getVertexInDegree(1))
-##print(graph.getVertexInDegree(4))
-# print(graph.getVertexOutDegree(1))
-# print(graph.getVertexOutDegree(4))
-# print(graph.isSuccessor(3, 1))
-# print(graph.isSuccessor(4, 3))
-# print(graph.isPredecessor(1, 3))
-# print(graph.getVertexCount())
-# print(graph.getEdgeCount())
-# print(graph.hasEdge(1, 2))
-# print(graph.hasEdge(2, 1))
-# print(graph.hasEdge(1, 3))
-for i in range(graph.numVertices + 1):
-    # Primeira linha (cabeçalho)
-    if i == 0:
-        print("     ", end="")  # espaço para o canto superior esquerdo
-        for j in range(graph.numVertices):
-            print(f"{j:>8}", end="")  # cabeçalho das colunas
-        print()
-    else:
-        # Linha da matriz com índice da linha
-        print(f"{i - 1:>3} ", end="")  # índice da linha
-        for j in range(graph.numVertices):
-            peso_vertice, peso_aresta = graph.matrix[i - 1][j]
-            print(f"({peso_vertice},{peso_aresta})", end="")
-        print()
-print()
-graph.exportToGEPHI("meu_grafo.gexf")
-# graph.removeEdge(3, 1)
-# for i in range(graph.numVertices + 1):
-#     # Primeira linha (cabeçalho)
-#     if i == 0:
-#         print("   ", end="")
-#         for j in range(graph.numVertices):
-#             print(f"{j:3}", end="")
-#         print()
-#     else:
-#         # Linha da matriz com índice da linha
-#         print(f"{i-1:2} ", end="")
-#         for j in range(graph.numVertices):
-#             print(f"{graph.matrix[i-1][j]:3}", end="")
-#         print()
-# print()
