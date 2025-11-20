@@ -9,23 +9,22 @@ class AdjacencyListGraph(AbstractGraph):
         self.edge_weights = {}
         self.vertex_weights = {}
 
-
     # método para validação do vértice
     # caso falhe já lança a exceção
     def _validate_vertex(self, v):
         if v < 0 or v >= self.numVertices:
             raise IndexError(f"Vertice {v} invalido")
-        
+
     def getVertexCount(self):
         return self.numVertices
 
     def getEdgeCount(self):
-     totalArestas = 0
-     for i in range(self.numVertices):
-       for j in range(len(self.adjacencias[i])):
-            if self.adjacencias[i][j] is not None:
-               totalArestas += 1
-     return totalArestas
+        totalArestas = 0
+        for i in range(self.numVertices):
+            for j in range(len(self.adjacencias[i])):
+                if self.adjacencias[i][j] is not None:
+                    totalArestas += 1
+        return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
         self._validate_vertex(u)
@@ -41,16 +40,16 @@ class AdjacencyListGraph(AbstractGraph):
         self._validate_vertex(v)
 
         if v == u:
-            raise ValueError("laco nao permitido em grafo simples")
+            return
         if self.hasEdge(u, v):
-            raise ValueError(f"ja possui esta aresta: {u} -> {v} ")
+            return
 
         self.adjacencias[u].append(v)
 
     def removeEdge(self, u: int, v: int):
         self._validate_vertex(u)
         self._validate_vertex(v)
-        
+
         if self.hasEdge(u, v):
             self.adjacencias[u].remove(v)
         else:
@@ -132,7 +131,7 @@ class AdjacencyListGraph(AbstractGraph):
 
         # caso todas os V estiverem marcado como visitado volta TRUE
         return all(visited)
-    
+
     def buscaProfundidade(self, v: int, visited: list[bool]):
         visited[v] = True
 
