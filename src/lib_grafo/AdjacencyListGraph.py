@@ -1,11 +1,11 @@
-import os
-from collections import deque
 from src.lib_grafo.AbstractGraph import AbstractGraph
 
+
 class AdjacencyListGraph(AbstractGraph):
-    def __init__(self, num_vertices):
-        super().__init__(num_vertices)
-        self.adjacencias = {i: [] for i in range(num_vertices)}
+
+    def __init__(self, numVertices):
+        self.numVertices = numVertices
+        self.adjacencias = {i: [] for i in range(numVertices)}
         self.edge_weights = {}
         self.vertex_weights = {}
 
@@ -13,12 +13,12 @@ class AdjacencyListGraph(AbstractGraph):
         return self.numVertices
 
     def getEdgeCount(self):
-        totalArestas = 0
-        for i in range(self.numVertices):
-            for j in range(len(self.adjacencias[i])):
-                if self.adjacencias[i][j] is not None:
-                    totalArestas += 1
-        return totalArestas
+     totalArestas = 0
+     for i in range(self.numVertices):
+       for j in range(len(self.adjacencias[i])):
+            if self.adjacencias[i][j] is not None:
+               totalArestas += 1
+     return totalArestas
 
     def hasEdge(self, u: int, v: int) -> bool:
         for i in range(len(self.adjacencias[u])):
@@ -31,8 +31,12 @@ class AdjacencyListGraph(AbstractGraph):
             print("nao e permitido laco")
             return
         if self.hasEdge(u, v):
-            print("ja possui esta aresta")
+            print(f"ja possui esta aresta: {u} -> {v} ")
             return
+        if self.hasEdge(v, u):
+            print(f"antiparalela: {u} -> {v} ")
+            return
+
         self.adjacencias[u].append(v)
 
     def removeEdge(self, u: int, v: int):
@@ -85,24 +89,53 @@ class AdjacencyListGraph(AbstractGraph):
         self.edge_weights[(u, v)] = w
 
     def getEdgeWeight(self, u: int, v: int):
-        return self.edge_weights.get((u, v), 1.0)
-
-    def isConnected(self):
-        visitados = set()
-        def dfs(v):
-            if v not in visitados:
-                visitados.add(v)
-                for viz in self.adjacencias[v]:
-                    dfs(viz)
-        dfs(0)
-        return len(visitados) == self.numVertices
-
-    def isEmptyGraph(self) -> bool:
-        return self.getEdgeCount() == 0
+        return self.edge_weights.get((u, v))
 
     def isCompleteGraph(self) -> bool:
         return self.getEdgeCount() == (self.getVertexCount() * (self.getVertexCount() - 1))
 
+    def isEmptyGraph(self) -> bool:
+        return self.getEdgeCount() == 0
+
+    def isConnected(self):
+
+
     def mostrarGrafo(self):
         for u, vizinhos in self.adjacencias.items():
             print(f"{u} -> {vizinhos}")
+
+    def exportToGEPHI(self, path: str):
+        try:
+            with open(path, 'w') as f:
+                f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                f.write('<graphml xmlns="http://graphml.graphdrawing.org/xmlns" '
+                        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+                        'xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns '
+                        'http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n')
+                if self.vertex_weights:
+                    f.write('  <key id="d0" for="node" attr.name="weight" attr.type="double"/>\n')
+                f.write('  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>\n')
+                f.write('  <graph id="G" edgedefault="directed">\n')
+                for u in range(self.numVertices):
+                    f.write(f'    <node id="{u}">\n')
+                    # Add Vertex Weight if it exists
+                    if u in self.vertex_weights:
+                        weight = self.vertex_weights[u]
+                        f.write(f'      <data key="d0">{weight}</data>\n')
+                    f.write('    </node>\n')
+                for u in range(self.numVertices):
+                    for v in self.adjacencias[u]:
+                        edge_key = (u, v)
+                        weight = self.getEdgeWeight(u, v)
+
+                        f.write(f'    <edge source="{u}" target="{v}">\n')
+                        f.write(f'      <data key="d1">{weight}</data>\n')  # Edge weight
+                        f.write('    </edge>\n')
+
+                f.write('  </graph>\n')
+                f.write('</graphml>\n')
+
+            print(f"\nGrafo exportado com sucesso para: {path}")
+
+        except Exception as e:
+            print(f"\nErro ao exportar o grafo: {e}")
