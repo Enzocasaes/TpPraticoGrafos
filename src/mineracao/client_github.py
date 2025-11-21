@@ -24,33 +24,86 @@ class GithubClient:
         return arr_id_issues
 
     def getOwnerIdByIssue(self, issueId):
-        ulrBusca = f"{GithubClient.URLBASE}/issues/{issueId}"
-        issue = requests.get(url=ulrBusca, headers=self.headers).json()
-        user = issue.get("user")
-        if user:
-            return user.get("id")
+        ulrBusca = "https://api.github.com/graphql"
+
+        variables = {
+            "owner": "sorrycc",
+            "repoName": "awesome-javascript",
+            "issueNumber": issueId
+        }
+
+        query = """
+            query GetAssigneeId($owner: String!, $repoName: String!, $issueNumber: Int!) {
+                repository(owner: $owner, name: $repoName) { 
+                  issue(number: $issueNumber) { 
+                    assignees(first: 1) { 
+                      nodes { 
+                        databaseId 
+                      } 
+                    } 
+                  } 
+                } 
+            }     
+        """
+
+        payload = {
+            "query": query,
+            "variables": variables
+        }
+
+        response = requests.post(url=ulrBusca, headers=self.headers, json=payload).json()
+        if response.get("errors"):
+            print(f"Erro GQL na issue {issueId}: {response['errors'][0]['message']}")
+            return None
+
+        issue = response["data"]["repository"].get("issue")
+        if issue is None:
+            print(f"Issue {issueId} não encontrada ou não existe.")
+            return None
+
+        assignee_nodes = issue.get("assignees", {}).get("nodes", [])
+        if assignee_nodes:
+            owner_id = assignee_nodes[0].get("databaseId")
+            return owner_id
+        else:
+            print(f"Issue {issueId} não possui responsável (assignee).")
+            return None
 
     def getIssuesComments(self):
-        ulrBusca = f"{GithubClient.URLBASE}/issues/comments"
-        arr_issues_comments = requests.get(url=ulrBusca, headers=self.headers).json()
+        base_url = f"{GithubClient.URLBASE}/issues/comments"
+        page = 1
         arr_users_comments = []
 
-        for issue in arr_issues_comments:
-            if issue["author_association"] == "OWNER":
-                continue
+        while True:
+            url_busca_paginada = f"{base_url}?page={page}&per_page=100"
 
-            issue_url = issue["issue_url"]
-            if issue_url:
+            print(f"Buscando página {page} de comentários...")
+            response = requests.get(url=url_busca_paginada, headers=self.headers)
+
+            if response.status_code != 200:
+                print(f"Erro ao buscar comentários: Status {response.status_code}")
+                break
+
+            arr_issues_comments = response.json()
+
+            if not arr_issues_comments:
+                break
+
+            for comment in arr_issues_comments:
+                issue_url = comment["issue_url"]
+                id_user = comment["user"]["id"]
+
                 match = re.search(r"\/(\d+)$", issue_url)
                 if match:
-                    id_issue = match.group(1)
+                    id_issue = int(match.group(1))
 
-            user = issue.get("user")
-            if user:
-                id_user = user.get("id")
-                if id_user:
-                    arr_users_comments.append((id_user,id_issue))
+                issue_author_id = self.getOwnerIdByIssue(id_issue)
 
+                if id_user != issue_author_id:
+                    print("Tupla inserida")
+                    arr_users_comments.append((id_user, id_issue))
+
+            page += 1
         return arr_users_comments
 
     def getIssueComments(self, issueId: str):
