@@ -24,7 +24,7 @@ def count():
     return len(mapUser)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     client = GithubClient()
     #print(client.getIssuesComments())
 
@@ -49,7 +49,6 @@ if _name_ == "_main_":
         print(u)
         comentarios = client.getIssueComments(idIssue)
 
-        comentarios = client.getIssueComments(idIssue)
 
         for comentario in comentarios:
             quemComentou = comentario["user"]["id"]
@@ -58,4 +57,4 @@ if _name_ == "_main_":
             grafo1.addEdge(v, u)
 
         print("-------------------------------------------------------------------------------------")
-   # grafo1.exportToGEPHI("grafo1List.gexf")
+    grafo1.exportToGEPHI("grafo1List.gexf")
