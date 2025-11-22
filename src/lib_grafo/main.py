@@ -7,9 +7,3 @@ from src.lib_grafo.AdjacencyListGraph import AdjacencyListGraph
 if __name__ == "__main__":
 
     client = GithubClient()
-
-
-
-
-
-

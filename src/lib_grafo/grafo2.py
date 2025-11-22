@@ -6,8 +6,8 @@ from src.lib_grafo.AdjacencyListGraph import AdjacencyListGraph
 mapUser = {}
 idRelativo = []
 def __init__(self):
-    self.map = {}  # GitHub ID → índice 0..N-1
-    self.idRelativo = []  # lista inversa: índice → GitHub ID
+    self.map = {}
+    self.idRelativo = []
 
 def getUser(userId):
     #funcao coloca o userId na lista e retorna o id adicionado

@@ -23,7 +23,6 @@ def getUser(userId):
 def count():
     return len(mapUser)
 
-
 if __name__ == "__main__":
     client = GithubClient()
     #print(client.getIssuesComments())
