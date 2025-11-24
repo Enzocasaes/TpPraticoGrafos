@@ -97,8 +97,7 @@ class GithubClient:
 
     def getIssuesCommentsParaGrafo1(self):
         urlBusca = f"{GithubClient.URLBASE}/issues/comments"
-        return requests.get(url=urlBusca, headers=self.headers).json()
-        ##return self.getAllPaginated(urlBusca)
+        return self.getAllPaginated(urlBusca)
 
     def getPullRequestReviews(self):
         reviews = []
@@ -181,8 +180,8 @@ class GithubClient:
         return requests.get(url=urlBusca, headers=self.headers).json()
 
     def getClosedIssues(self):
-        urlBusca = f"{GithubClient.URLBASE}/issues"
-        return requests.get(url=urlBusca, headers=self.headers, params={"state": "closed"}).json()
+        urlBusca = f"{GithubClient.URLBASE}/issues?state=closed&per_page=100"
+        return self.getAllPaginated(urlBusca)
 
     def getOpenIssues(self):
         urlBusca = f"{GithubClient.URLBASE}/issues"

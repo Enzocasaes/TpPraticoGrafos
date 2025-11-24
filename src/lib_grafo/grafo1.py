@@ -60,4 +60,4 @@ if __name__ == "__main__":
 
         print("-------------------------------------------------------------------------------------")
 
-    grafo1.exportToGEPHI("grafo1List.gexf")
+    grafo1.exportToGEPHI("grafo1.gexf")

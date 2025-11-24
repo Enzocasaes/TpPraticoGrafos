@@ -1,20 +1,20 @@
 import os
 from src.mineracao.client_github import GithubClient
-from src.lib_grafo.AdjacencyMatrixGraph import AdjacencyMatrixGraph
 from src.lib_grafo.AdjacencyListGraph import AdjacencyListGraph
 
 mapUser = {}
 idRelativo = []
-def __init__(self):
-    self.map = {}
-    self.idRelativo = []
+
 
 def getUser(userId):
-    #funcao coloca o userId na lista e retorna o id adicionado
+    """
+    Registra um usuário novo e retorna seu ID convertido
+    """
     if userId not in mapUser:
         mapUser[userId] = len(mapUser)
         idRelativo.append(userId)
     return mapUser[userId]
+
 
 def count():
     return len(mapUser)
@@ -22,33 +22,47 @@ def count():
 
 if __name__ == "__main__":
     client = GithubClient()
-    #print(client.getClosedIssues())
 
+    # Todas as issues fechadas (paginação corrigida)
     issueFechada = client.getClosedIssues()
 
-    #esse for pega todos os vertices do grafo(tanto usuarios que abriram quanto os que fecharam), e colocando no map(lista)
+    # ===== REGISTRA TODOS OS USUÁRIOS (ABRIRAM / FECHARAM) =====
     for issue in issueFechada:
+        # Quem abriu a issue
         quemAbriu = issue["user"]["id"]
-        quemFechou = issue["closed_by"]["id"]
-
         getUser(quemAbriu)
+
+        # Quem fechou a issue (pode ser None!)
+        closed_by = issue["closed_by"]
+        if closed_by is None:
+            # Issue fechada automaticamente ou via PR
+            # Não incluímos usuário inexistente
+            continue
+
+        quemFechou = closed_by["id"]
         getUser(quemFechou)
 
-
+    # ===== CRIA O GRAFO =====
     grafo2 = AdjacencyListGraph(count())
-    #esse for passa por todas as issues fechadas e pegas os usuarios e gera as arestas
+
+    # ===== ADICIONA ARESTAS (quem FECHOU → quem ABRIU) =====
     for issue in issueFechada:
         quemAbriu = issue["user"]["id"]
-        quemFechou = issue["closed_by"]["id"]
+        closed_by = issue["closed_by"]
+
+        # pula issues sem quem fechou
+        if closed_by is None:
+            continue
+
+        quemFechou = closed_by["id"]
+
         u = getUser(quemAbriu)
         v = getUser(quemFechou)
 
+        # Aresta: fechador -> abridor
         grafo2.addEdge(v, u)
 
+    # ===== EXPORTA PARA GEPHI =====
     grafo2.exportToGEPHI("grafo2.gexf")
 
-
-
-
-
-
+    print("grafo2.gexf gerado com sucesso!")
