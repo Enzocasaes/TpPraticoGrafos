@@ -97,6 +97,7 @@ class GithubClient:
 
     def getIssuesCommentsParaGrafo1(self):
         urlBusca = f"{GithubClient.URLBASE}/issues/comments"
+        #return requests.get(url=urlBusca, headers=self.headers).json()
         return self.getAllPaginated(urlBusca)
 
     def getPullRequestReviews(self):
@@ -105,7 +106,7 @@ class GithubClient:
         page = 1
 
         while True:
-            urlBusca = f"{urlBase}?state=all&page={page}&per_page=20"
+            urlBusca = f"{urlBase}?state=all&page={page}&per_page=100"
             response = requests.get(url=urlBusca, headers=self.headers)
 
             if response.status_code != 200:
@@ -135,8 +136,8 @@ class GithubClient:
 
     def getIssueCommentsParaGrafo1(self, issueId: str):
         urlBusca = f"{GithubClient.URLBASE}/issues/{issueId}/comments"
-        return requests.get(url=urlBusca, headers=self.headers).json()
-        ##return self.getAllPaginated(urlBusca)
+        #return requests.get(url=urlBusca, headers=self.headers).json()
+        return self.getAllPaginated(urlBusca)
 
     def getIssuesComments(self):
         base_url = f"{GithubClient.URLBASE}/issues/comments"
@@ -144,7 +145,7 @@ class GithubClient:
         arr_users_comments = []
 
         while True:
-            url_busca_paginada = f"{base_url}?page={page}&per_page=20"
+            url_busca_paginada = f"{base_url}?page={page}&per_page=100"
 
             print(f"Buscando página {page} de comentários...")
             response = requests.get(url=url_busca_paginada, headers=self.headers)
@@ -180,8 +181,8 @@ class GithubClient:
         return requests.get(url=urlBusca, headers=self.headers).json()
 
     def getClosedIssues(self):
-        urlBusca = f"{GithubClient.URLBASE}/issues?state=closed&per_page=100"
-        return self.getAllPaginated(urlBusca)
+        urlBusca = f"{GithubClient.URLBASE}/issues"
+        return requests.get(url=urlBusca, headers=self.headers, params={"state": "closed"}).json()
 
     def getOpenIssues(self):
         urlBusca = f"{GithubClient.URLBASE}/issues"
@@ -328,7 +329,7 @@ class GithubClient:
         arr_contributors = []
 
         while(True):
-            urlBusca = f"{url}?page={page}&per_page=20"
+            urlBusca = f"{url}?page={page}&per_page=100"
             response = requests.get(url=urlBusca, headers=self.headers)
 
             if response.status_code != 200:
