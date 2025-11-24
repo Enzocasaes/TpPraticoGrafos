@@ -1,59 +1,63 @@
 import os
 from src.mineracao.client_github import GithubClient
-from src.lib_grafo.AdjacencyMatrixGraph import AdjacencyMatrixGraph
 from src.lib_grafo.AdjacencyListGraph import AdjacencyListGraph
 
 mapUser = {}
 idRelativo = []
 
-
-def _init_(self):
+def __init__(self):
     self.map = {}  # GitHub ID → índice 0..N-1
     self.idRelativo = []  # lista inversa: índice → GitHub ID
 
-
 def getUser(userId):
-    # funcao coloca o userId na lista e retorna o id adicionado
     if userId not in mapUser:
         mapUser[userId] = len(mapUser)
         idRelativo.append(userId)
     return mapUser[userId]
 
-
 def count():
     return len(mapUser)
 
+
 if __name__ == "__main__":
     client = GithubClient()
-    #print(client.getIssuesComments())
 
-    issueComentada = client.getIssuesComments()
+    issueComentada = client.getIssuesCommentsParaGrafo1()
     #for para pegar os donos das issues comentadas e adicionar na lista, alem de pegar tambem quem comentou nas issues
-    for (idUserComment, idIssue) in issueComentada:
-        dono = idUserComment
-        getUser(dono)
+    for item in issueComentada:
+        idUserComment = item["user"]["id"]
 
-        comentarios = client.getIssueComments(idIssue)
-        #adiciona quem comentou na lista
+        # extrair id da issue a partir da URL
+        issue_url = item["issue_url"]
+        idIssue = issue_url.split("/")[-1]
+
+        getUser(idUserComment)
+
+        comentarios = client.getIssueCommentsParaGrafo1(idIssue)
+
+
         for comentario in comentarios:
             quemComentou = comentario["user"]["id"]
             getUser(quemComentou)
 
     grafo1 = AdjacencyListGraph(count())
-    #adicionando arestas
-    for (idUserComment, idIssue) in issueComentada:
-        dono = idUserComment
-        u = getUser(dono)
-        print("----->",idIssue)
-        print(u)
-        comentarios = client.getIssueComments(idIssue)
 
+    for item in issueComentada:
+        idUserComment = item["user"]["id"]
+
+        issue_url = item["issue_url"]
+        idIssue = issue_url.split("/")[-1]
+
+        u = getUser(idUserComment)
+        comentarios = client.getIssueCommentsParaGrafo1(idIssue)
 
         for comentario in comentarios:
             quemComentou = comentario["user"]["id"]
             v = getUser(quemComentou)
-            print(v)
+
+
             grafo1.addEdge(v, u)
 
         print("-------------------------------------------------------------------------------------")
+
     grafo1.exportToGEPHI("grafo1List.gexf")
